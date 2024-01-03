@@ -9,16 +9,12 @@ kirjainpisteet = {
 
 def get_alkuosa(tilaa_edessa, sana_alku, sanalista, kirjaimet):
     reg_patt = f".{{0,{tilaa_edessa}}}{sana_alku}"
-    #print('reg_patt',reg_patt)
     reg = re.compile(reg_patt)
-    #print(reg)
     karsitut_sanat = [word for word in sanalista if reg.fullmatch(word)]  
     kirjaimet_poydalla = sana_alku.replace('.', '')
     if len(karsitut_sanat)==0:
-        #print('ei karsittuja sanoja')
         return
     tarkistettavat_sanat = [kerro_kirjaimet(sana, kirjaimet_poydalla) for sana in karsitut_sanat]
-    #print('tarkistettavat sanat', tarkistettavat_sanat)
 
     kirjain_counter = Counter(kirjaimet)
     jokerit = kirjain_counter['*']
@@ -43,16 +39,12 @@ def get_alkuosa(tilaa_edessa, sana_alku, sanalista, kirjaimet):
 def get_loppuosa(tilaa_lopussa, sana_loppu, sanalista, kirjaimet):
 
     reg_patt = f"{sana_loppu}.{{0,{tilaa_lopussa}}}"
-    #print('reg_patt',reg_patt)
     reg = re.compile(reg_patt)
-    #print(reg)
     karsitut_sanat = [word for word in sanalista if reg.fullmatch(word)]  
     kirjaimet_poydalla = sana_loppu.replace('.', '')
     if len(karsitut_sanat)==0:
-        #print('ei karsittuja sanoja')
         return
     tarkistettavat_sanat = [kerro_kirjaimet(sana, kirjaimet_poydalla) for sana in karsitut_sanat]
-    #print('tarkistettavat sanat', tarkistettavat_sanat)
 
     kirjain_counter = Counter(kirjaimet)
     jokerit = kirjain_counter['*']
@@ -78,10 +70,7 @@ def get_kokonaisuus(sanalista, kirjaimet, poyta):
     tilaa_edessa = int(poyta[0])
     tilaa_lopussa = int(poyta[-1])
     jaljelle_jaava = poyta[1:-1]
-    #print('jaljelle_jaava', jaljelle_jaava)
-    #print('tilaa edessa', tilaa_edessa, tilaa_lopussa)
     reg_patt = f".{{0,{tilaa_edessa}}}{jaljelle_jaava}.{{0,{tilaa_lopussa}}}"
-    #print('reg_patt',reg_patt)
     reg = re.compile(reg_patt)
 
     karsitut_sanat = [word for word in sanalista if reg.fullmatch(word)]  
@@ -91,7 +80,6 @@ def get_kokonaisuus(sanalista, kirjaimet, poyta):
         return
     tarkistettavat_sanat = [kerro_kirjaimet(sana, kirjaimet_poydalla) for sana in karsitut_sanat]
     print('kasitut', karsitut_sanat, '\n')
-    #print('tarkistettavat sanat', tarkistettavat_sanat)
 
     kirjain_counter = Counter(kirjaimet)
     jokerit = kirjain_counter['*']
@@ -118,31 +106,18 @@ def get_kokonaisuus(sanalista, kirjaimet, poyta):
 def kolme_osaa(siistityt_sanat, kirjaimet, poyta):
     ilman_loppuosaa = poyta.rsplit('.', 1)[0]
     ilman_alkuosaa = poyta.split('.',1)[-1]  
-    #osat = list(filter(None, poyta.split('.')))
-    #print('osat', osat)
 
     tilaa_edessa = int(ilman_loppuosaa[0])
     alkuosa = ilman_loppuosaa[1:]
     loppuosa = ilman_alkuosaa[:-1]
     tilaa_takana = int(ilman_alkuosaa[-1])   
-    #print('alkuosa',ilman_loppuosaa)
-    #print('alkuosa', alkuosa)
-    #print('tilaa edessa', tilaa_edessa)
-
-    #print('loppuosa',ilman_alkuosaa)
-    #print('loppuosa', loppuosa)
-    #print('tilaa takana', tilaa_takana)
 
     tasmaavat_alkusanat = get_alkuosa(tilaa_edessa, alkuosa, siistityt_sanat, kirjaimet)
-    #print('tasmaavat_alkusanat', tasmaavat_alkusanat)
     tasmaavat_loppusanat = get_loppuosa(tilaa_takana, loppuosa, siistityt_sanat, kirjaimet)
-    #print('tasmaavat_loppusanat', tasmaavat_loppusanat)
     tasmaavat_koko = get_kokonaisuus(siistityt_sanat, kirjaimet, poyta)
-    #print('tasmaavat_koko', tasmaavat_koko)
 
     kaikki_tasmaavat = list(tasmaavat_alkusanat.union(tasmaavat_loppusanat).union(tasmaavat_koko))
     sorted_osumat = sorted(kaikki_tasmaavat, key=lambda x: (len(x), x))
-    #print('kaikki tasmaavat', sorted_osumat)
     if len(sorted_osumat) > 0 :
             print(sorted_osumat)
             longest_sana = len(max(sorted_osumat, key=len))

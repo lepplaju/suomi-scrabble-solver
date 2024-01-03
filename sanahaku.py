@@ -4,8 +4,8 @@ import csv
 import copy
 from collections import Counter
 
+# Ladattu tiedosto omassa hakemistossa
 tiedostonnimi = 'aineisto/nykysuomensanalista2022.csv'
-#tiedostonnimi = 'aineisto/temp.csv'
 
 kaikki_sanat = []
 pituusjarjestys = True
@@ -17,28 +17,17 @@ kirjainpisteet = {
 
 with open(tiedostonnimi, encoding='utf-8') as tiedosto:
     csv_tiedosto = csv.reader(tiedosto)
-    #print(csv_tiedosto)
     for rivi in csv_tiedosto:
-        #print(rivi)
         kaikki_sanat.extend(rivi)
-
-#print(kaikki_sanat)
-
-#print(kaikki_sanat)
 
 siistityt_sanat = []
 erottaja = '\\t'
 
 for sana in kaikki_sanat[1:]:
-    #print(re.split(erottaja, sana,maxsplit=1))
     temp = (re.split(erottaja, sana, maxsplit=1)[0])
 
-    #print(temp)
     if len(temp) <= max_pituus_global and len(temp)>1:
         siistityt_sanat.append(temp.lower())
-
-#print('siistityt:,', siistityt_sanat)
-#print(len(siistityt_sanat))
 
 #---------------------------------------------------------------
 def sisaltaa_sanan(sana_param, kirjaimet):
@@ -52,7 +41,6 @@ def sisaltaa_sanan(sana_param, kirjaimet):
         print('ei osumia hakuehdoilla')
         return
     tarkistettavat_sanat = [sana.replace(sana_param, '') for sana in karsitut_sanat]
-    #print('tarkistettavat sanat', tarkistettavat_sanat)
 
     osumat = set()
     kirjain_counter = Counter(kirjaimet)
@@ -91,10 +79,6 @@ def sisaltaa_sanan(sana_param, kirjaimet):
     
 
 
-
-
-# karsitut_sanat = [sana[1:] for sana in siistityt_sanat if sana[0]==aloituskirjain and len(sana) >= min_pituus and len(sana) <= max_pituus]
-
 #---------------------------------------------------------------
 
 
@@ -109,9 +93,7 @@ def tarkista_poytasyote(kirjaimet, poyta, min_pituus, max_pituus):
                 osat = list(filter(None, kuvitussyote.split('.')))
                 if len(osat) > 2:
                     viilaus.kolme_osaa(siistityt_sanat,kirjaimet, poyta)
-                    #print('temp:', osat)
                     return
-                print('edetään parsijaan')
                 kirjainpaikat.edistynyt_parsija(siistityt_sanat, kirjaimet, poyta)
                 return
             parsijan_sanat = list(kirjainpaikat.parsija(siistityt_sanat, kirjaimet, poyta))
@@ -119,7 +101,6 @@ def tarkista_poytasyote(kirjaimet, poyta, min_pituus, max_pituus):
             if len(sorted_tulokset) > 0:
                 longest_length = len(max(sorted_tulokset, key=len))
                 for osuma in sorted_tulokset:
-                    #tulokset.append((osuma,get_pisteet(osuma)))
                     print(f"{osuma:<{longest_length+2}}", " pisteet: ", get_pisteet(osuma), sep='')
                 return
             else:
@@ -130,10 +111,7 @@ def tarkista_poytasyote(kirjaimet, poyta, min_pituus, max_pituus):
         sisaltaa_sanan(sana_poydalla, kirjaimet)
         return
     karsitut_sanat = []
-    #print('onko ensimmainen kirjain?', kuvitussyote[0].isalpha())
-    #print('onko viimeinen kirjain?', kuvitussyote[-1].isalpha())
     if kuvitussyote[0].isalpha():
-        #print('aloituslukko', kuvitussyote[0])
         aloituslukko = True
         aloituskirjain = kuvitussyote[0].lower()
     elif kuvitussyote[-1].isalpha():
@@ -141,7 +119,6 @@ def tarkista_poytasyote(kirjaimet, poyta, min_pituus, max_pituus):
         lopetuskirjain = kuvitussyote[-1].lower()
 
     if aloituslukko==True:
-        #print('sana', sana_param)
         karsitut_sanat = [sana[1:] for sana in siistityt_sanat if sana[0]==aloituskirjain and len(sana) >= min_pituus and len(sana) <= max_pituus]
     elif lopetuslukko == True:
         karsitut_sanat = [sana[:-1] for sana in siistityt_sanat if sana[-1]==lopetuskirjain and len(sana) >= min_pituus and len(sana) <= max_pituus]
@@ -169,21 +146,15 @@ def tarkista_poytasyote(kirjaimet, poyta, min_pituus, max_pituus):
         if jokerit == 0:
             if all(sana_counter[kirjain] <= kirjain_counter[kirjain] for kirjain in sana_counter):
                 if aloituslukko == True:
-                    #print('Alk. lisäämässä:',aloituskirjain, sana)
                     osumat.add(aloituskirjain+sana)
                 elif lopetuslukko == True:
-                    #print('lop. lisäämässä:',lopetuskirjain, sana)
                     osumat.add(sana+lopetuskirjain)
         elif jokerit > 0:
-            #print('jokerien määrä:', jokerit)
             temp_counter = copy.copy(sana_counter)
-            #print(sana,'valuesit', temp_counter.values())
             for kirjain in sana_counter:
-                #print('in sana_counter', kirjain, kirjain_counter[kirjain])
                 if kirjain_counter[kirjain]>0:
                     temp_counter[kirjain] = temp_counter[kirjain]-1
             
-            #print('sana:', sana, 'aravaamattomien määrä:', sum(temp_counter.values()))
             if jokerit >= sum(temp_counter.values()):
                 if aloituslukko == True:
                     osumat.add(aloituskirjain+sana)
@@ -196,15 +167,12 @@ def tarkista_poytasyote(kirjaimet, poyta, min_pituus, max_pituus):
         if pituusjarjestys == True:
             sorted_tulokset = sorted(osumat, key=lambda x: (len(x), x))
             longest_length = len(max(sorted_tulokset, key=len))
-            #print('sorted_tulokset:',sorted_tulokset)
             for i, osuma in enumerate(sorted_tulokset):
-                #tulokset.append((osuma,get_pisteet(osuma)))
                 print(f"{osuma:<{longest_length+2}}", " : ", get_pisteet(osuma), sep='')
         else:
             for i, osuma in enumerate(osumat):
                 tulokset.append((osuma,get_pisteet(osuma)))
                 sorted_tulokset = sorted(tulokset, key=lambda x: x[1])
-                #print('sortatut:', sorted_tulokset)
                 longest_length = len(max(sorted_tulokset, key=lambda x: len(x[0]))[0])
 
             if sorted_tulokset is not None:
@@ -235,10 +203,6 @@ def get_pisteet(sana):
     return summa
 
 def hae_kaikki_sanat(annetut_kirjaimet):
-
-    #print('Anna maksimipituus:') 
-    # pituus = input()
-    
     pituus = None
     if pituus is not None and int(pituus) > 2:
         max_pituus = int(pituus)
@@ -247,21 +211,11 @@ def hae_kaikki_sanat(annetut_kirjaimet):
 
     min_pituus = 2
     
-    ''' 
-    if '-' in annettu_pituus:
-        min_pituus, max_pituus = annettu_pituus.split('-')
-        min_pituus = int(min_pituus)
-        max_pituus = int(max_pituus)
-    else:
-        pituus = int(annettu_pituus)
-
-    '''
     poyta = ''
     if ' ' in annetut_kirjaimet:
         temp = annetut_kirjaimet.split(' ')
         kirjaimet = temp[0]
         poyta = temp[1]
-        #print('\nennen jatka_muualla')
         tarkista_poytasyote(kirjaimet, poyta, min_pituus, max_pituus)
         return
     else:
@@ -287,35 +241,17 @@ def hae_kaikki_sanat(annetut_kirjaimet):
                 if all(sana_counter[kirjain] <= kirjain_counter[kirjain] for kirjain in sana_counter):
                     osumat.add(sana)
             else:
-                #print('jokerien määrä:', jokerit)
                 temp_counter = copy.copy(sana_counter)
-                #print(sana,'valuesit', temp_counter.values())
-                for kirjain in sana_counter:
-                    #print('in sana_counter', kirjain, kirjain_counter[kirjain])
+                for kirjain in sana_counter:            
                     if kirjain_counter[kirjain]>0:
                         temp_counter[kirjain] -= kirjain_counter[kirjain]
                         if temp_counter[kirjain]<0:
                             temp_counter[kirjain] = 0
-                
-                #print('sana:', sana, 'aravaamattomien määrä:', sum(temp_counter.values()))
-                #print(sum(temp_counter.values()))
-                #print(jokerit)
                 if jokerit >= sum(temp_counter.values()):
                     osumat.add(sana)
-
-            #print('sana:',sana,"".join(kirjaimet))
-            '''
-            print(sana, 'sana_counter:')
-            print(sana_counter)
-            print('kirjain_counter:')
-            print(kirjain_counter)
-            print()
-            '''
             
-        
-
+    
     print('hakuehdon täyttävien määrä:', len(osumat))
-    #sorted_list = sorted(osumat, key=lambda x: (len(x), x))
     
     
     tulokset = []
@@ -323,19 +259,13 @@ def hae_kaikki_sanat(annetut_kirjaimet):
     if pituusjarjestys == True:
         longest_length = len(max(osumat, key=len))
         sorted_tulokset = sorted(osumat, key=lambda x: (len(x), x))
-        #print('sorted_tulokset:',sorted_tulokset)
         for i, osuma in enumerate(sorted_tulokset):
-            #tulokset.append((osuma,get_pisteet(osuma)))
             print(f"{i+1:<3}: {osuma:<{longest_length+2}}", " : ", get_pisteet(osuma), sep='')    
-    #print('tulokset', tulokset)
-    #print('tulokset[0][1]:', tulokset[0][1])
     else:
         for i, osuma in enumerate(osumat):
             tulokset.append((osuma,get_pisteet(osuma)))
         
         sorted_tulokset = sorted(tulokset, key=lambda x: x[1])
-        #print('sortatut:', sorted_tulokset)
-
         longest_length = len(max(sorted_tulokset, key=lambda x: len(x[0]))[0])
 
         for ind, pari in enumerate(sorted_tulokset):
@@ -344,13 +274,7 @@ def hae_kaikki_sanat(annetut_kirjaimet):
 
 
 
-
-        
-    #print('Anna kirjaimet: ')
-    #syote = input()
-    #print(syote)
-
-
+# Ohjelman varsinainen ajo tapahtuu tässä
 while True:
     print('\nAnna kirjaimet: ')
     kirjaimet = input()
@@ -358,20 +282,10 @@ while True:
         break
     hae_kaikki_sanat(kirjaimet)
 
-#print('Anna sanan pituus: ')
-#pituus = input()
-
-#print(len(siistityt_sanat))
-
-
-#print('sanojen pituus:',len(siistityt_sanat))
-
-#hae_sanat(kirjaimet, pituus)
 
 
 #---------------------------------------------------------------
 def hae_sanat(annetut_kirjaimet, annettu_pituus):
-    #print('annetut kirjaimet:', annetut_kirjaimet)
     min_pituus = None
     max_pituus = None 
     if '-' in annettu_pituus:
@@ -385,12 +299,10 @@ def hae_sanat(annetut_kirjaimet, annettu_pituus):
         kirjaimet = annetut_kirjaimet
     else:
         kirjaimet = ''
-    #hakuehto = r"\b\w*{}+\w*\b".format(kirjaimet)
 
     hakuehto =''
     for kirjain in kirjaimet:
         hakuehto += r'(?=.*' + re.escape(kirjain) + r')'
-    #print('hakuehto',hakuehto)
     osumat = []
     if min_pituus is not None and max_pituus is not None:
         karsitut_sanat = [sana for sana in siistityt_sanat if len(sana) >= min_pituus and len(sana) <= max_pituus]

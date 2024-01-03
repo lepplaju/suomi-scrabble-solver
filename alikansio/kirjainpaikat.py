@@ -22,14 +22,11 @@ def get_alkuosa(tilaa_edessa, sana_alku, sanalista, kirjaimet):
     reg = re.compile(reg_patt)
     print(reg)
     karsitut_sanat = [word for word in sanalista if reg.fullmatch(word)]
-    #print(karsitut_sanat)
     kirjaimet_poydalla = sana_alku.replace('.', '')
     if len(karsitut_sanat)==0:
         print('ei karsittuja sanoja')
         return
     tarkistettavat_sanat = [kerro_kirjaimet(sana, kirjaimet_poydalla) for sana in karsitut_sanat]
-
-    #print('tarkistettavat sanat', tarkistettavat_sanat)
 
 
     kirjain_counter = Counter(kirjaimet)
@@ -58,7 +55,6 @@ def get_loppuosa(tilaa_lopussa, sana_loppu, sanalista, kirjaimet):
     reg = re.compile(reg_patt)
     print(reg)
     karsitut_sanat = [word for word in sanalista if reg.fullmatch(word)]
-    #print(karsitut_sanat)
 
     kirjaimet_poydalla = sana_loppu.replace('.', '')
     if len(karsitut_sanat)==0:
@@ -66,7 +62,6 @@ def get_loppuosa(tilaa_lopussa, sana_loppu, sanalista, kirjaimet):
         return
     tarkistettavat_sanat = [kerro_kirjaimet(sana, kirjaimet_poydalla) for sana in karsitut_sanat]
 
-    #print('tarkistettavat sanat', tarkistettavat_sanat)
     kirjain_counter = Counter(kirjaimet)
     jokerit = kirjain_counter['*']
    
@@ -100,22 +95,9 @@ def get_osat(sanalista, kirjaimet, syote):
 
     tasmaavat_loppusanat = get_loppuosa(tilaa_takana, sana_loppu, sanalista, kirjaimet)
 
-    #print('alkusanat', tasmaavat_alkusanat)
-    #print('loppusanat', tasmaavat_loppusanat)
-
-
     kaikki_tasmaavat = tasmaavat_alkusanat.union(tasmaavat_loppusanat)
-    #sorted_tulokset = sorted(kaikki_tasmaavat, key=lambda x: (len(x), x))
-    #print('kaikki tasmaavat')
-    #for osuma in sorted_tulokset:
-        #tulokset.append((osuma,get_pisteet(osuma)))
-    #    print(f"{osuma:<{len(osuma)+2}}", " pisteet: ", get_pisteet(osuma), sep='')
-    #print('---------------------')
 
     return kaikki_tasmaavat
-    
-
-    #tasmaavat_loppusanat = get_loppuosa(tarkistettavat_sanat, karsitut_sanat, kirjain_counter, jokerit)
 
     
 
@@ -129,14 +111,12 @@ def get_pisteet(sana):
 
 # miten erotellaan kun 2a.i.u2 vs 2a...u2 
 def edistynyt_parsija(sanalista,kirjaimet, syote): 
-    if ".." in syote:
-        #print('alkuperäinen syöte',syote) 
+    if ".." in syote: 
         osa_osumat = get_osat(sanalista, kirjaimet, syote)
         taydet_osumat = parsija(sanalista,kirjaimet, syote)
 
         kaikki_osumat = list(osa_osumat.union(taydet_osumat))
         sorted_osumat = sorted(kaikki_osumat, key=lambda x: (len(x), x))
-        #print('kaikki osumat', sorted_osumat)
         if len(sorted_osumat) >0 :
             longest_sana = len(max(sorted_osumat, key=len))
             for osuma in sorted_osumat:
@@ -145,54 +125,29 @@ def edistynyt_parsija(sanalista,kirjaimet, syote):
             print('ei osumia hakuehdoilla')
         
         print('---------------------')
-        #print('tarkistettavat sanat', tarkistettavat_sanat)
-
-
-        # etsi sanat, jotka ottavat huomioon tilan ennen ja lopettavat pituuden ennen vikaa kirjainta
-        #regex_pattern = f".{{0,{tilaa_edessa}}}{tilaa}.{{0,{tilaa_jalkeen}}}"
-
-
-    # tehdään kolme hakua:
-    # ensin sanat, jotka menevät koko ehdon alueelle
-    # toiseksi sanat, jotka menevät osittain aluulle
-
-
-
 
 
 def parsija(sanalista,kirjaimet, syote):
-    print("parsijassa")
     palautettavat = set()
-    #print('syöte',syote)
     jaljelle_jaavat = copy.copy(syote)
     tilaa_ennen = int(syote[0])
     tilaa_jalkeen = int(syote[-1])
     jaljelle_jaavat = jaljelle_jaavat.replace(str(tilaa_ennen),'').replace(str(tilaa_jalkeen),'')
-    #print('tilaa ennen:', tilaa_ennen,'\ntilaa jalkeen:',tilaa_jalkeen)
-    #print('jaljelle jäävät',jaljelle_jaavat)
 
 
     regex_pattern = f".{{0,{tilaa_ennen}}}{jaljelle_jaavat}.{{0,{tilaa_jalkeen}}}"
-    #print('regex',regex_pattern)
     regex = re.compile(regex_pattern)
-    #print('regex:', regex)
 
     karsitut_sanat = [word for word in sanalista if regex.fullmatch(word)]
     print('Karsitut sanat: ',karsitut_sanat)
-    #print('listattuna:',karsitut_sanat)
-    #print('---------------------')
 
 
     kirjaimet_poydalla = jaljelle_jaavat.replace('.', '')
-    #print('kirjaimet_poydalla',kirjaimet_poydalla)
 
     if len(karsitut_sanat)==0:
         print('ei karsittuja sanoja')
         return palautettavat
     tarkistettavat_sanat = [kerro_kirjaimet(sana, kirjaimet_poydalla) for sana in karsitut_sanat]
-    #print('tarkistettavat sanat', tarkistettavat_sanat)
-
-    #osumat = set()
     kirjain_counter = Counter(kirjaimet)
     jokerit = kirjain_counter['*']
 
@@ -209,18 +164,7 @@ def parsija(sanalista,kirjaimet, syote):
             
             if jokerit >= sum(temp_counter.values()):
                 palautettavat.add(karsitut_sanat[i])
-    
-    if len(palautettavat) <1 :
-        #print('ei osumia hakuehdoilla')
-        print()
-        #print('---------------------')
-        return palautettavat
-    #print('---------------------')
+
     return palautettavat
-    sorted_tulokset = sorted(palautettavat, key=lambda x: (len(x), x))
-    longest_length = len(max(sorted_tulokset, key=len))
-    for osuma in sorted_tulokset:
-            #tulokset.append((osuma,get_pisteet(osuma)))
-            print(f"{osuma:<{longest_length+2}}", " pisteet: ", get_pisteet(osuma), sep='')
 
     
